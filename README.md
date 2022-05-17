@@ -45,9 +45,11 @@ optional arguments:
   -m MEMO, --memo MEMO  Optional. Memo to send in each tx (ex. With 💜 from Lavender.Five Nodes 🐝)
   -k KEYNAME, --keyname KEYNAME
                         Wallet to issue refunds from
-  --dry_run [DRY_RUN]   Indicates whether this should actually broadcast transactions or not
   -f REFUND_FILE, --refund_file REFUND_FILE
-                        Indicates whether this should actually broadcast transactions or not
+                        CSV file that encodes the delegator addresses and refund amounts. Note: delegator address is expected to be in the first column and the refund amount in [DENOM] is expected to be in the fourth column.
+  --dry_run             Indicates whether this should actually broadcast transactions or not
+  --no_broadcast        Similar to dry run, but in this case the tx JSON is output and signed, but not broadcast. This is useful for testing.
+
 ```
 
 
