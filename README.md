@@ -12,6 +12,11 @@ python3 src/refund.py --denom {denom} --daemon {denom} --c {chain_id} -e {rpc_en
 python3 src/refund.py --denom uatom --daemon gaiad --c cosmoshub-4 -e http://65.21.132.124:10657 -vc cosmosvalcons1c5e86exd7jsyhcfqdejltdsagjfrvv8xv22368 -v cosmosvaloper140l6y2gp3gxvay6qtn70re7z2s0gn57zfd832j -s cosmos15s9vggt9d0xumzqeq89scy4lku4k6qlzvvv2lz -m "With 💜 from Lavender.Five Nodes 🐝"
 ```
 
+This will output two different kinds of files
+
+* `/tmp/dist_<denom>_<batch #>.json` which is the unsigned JSON representation of a batch transaction
+* `~/dist_<denom>_<batch #>_signed.json` which represents the signed, but not yet broadcast batch transaaction
+
 In addition to the original Lavender.Five nodes version of this script, there are two new command
 line options, `--dry_run` and `-f`/`--refund_file`. Details below:
 
@@ -45,7 +50,7 @@ optional arguments:
                         Indicates whether this should actually broadcast transactions or not
 ```
 
-This will output `/tmp/dist.json`
+
 
 ### Previous Attempts
 
