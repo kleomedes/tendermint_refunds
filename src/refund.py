@@ -180,17 +180,17 @@ def buildRefundScript(
 
 def issue_refunds(
     batch_count: int, daemon: str, chain_id: str, keyname: str, node: str,
-    denom: str, dry_run: bool = False,
+    denom: str, should_broadcast: bool = True, dry_run: bool = False,
 ):
     i = 0
     while i < batch_count:
         sign_cmd = (
             f"{BIN_DIR}{daemon} tx sign /tmp/dist_{denom}_{i}.json --from {keyname} -ojson "
-            f"--output-document ~/dist_{denom}_signed.json --node {node} --chain-id {chain_id} "
+            f"--output-document ~/dist_{denom}_{i}_signed.json --node {node} --chain-id {chain_id} "
             f"--keyring-backend test"
         )
         broadcast_cmd = (
-            f"{BIN_DIR}{daemon} tx broadcast ~/dist_{denom}_signed.json --node {node} "
+            f"{BIN_DIR}{daemon} tx broadcast ~/dist_{denom}_{i}_signed.json --node {node} "
             f"--chain-id {chain_id}"
         )
 
@@ -200,8 +200,11 @@ def issue_refunds(
             logger.debug(f"broadcast cmd: {broadcast_cmd}")
         else:
             # sign
-            result = run(sign_cmd, shell=True, capture_output=True, text=True)
-            logger.info(f'subprocess.run() result: {result}')
+            if should_broadcast:
+                result = run(sign_cmd, shell=True, capture_output=True, text=True)
+                logger.info(f'subprocess.run() result: {result}')
+            else:
+                logger.debug('--no_broadcast was passed, not running broadcast command')
             sleep(1)
 
             # broadcast
@@ -282,30 +285,43 @@ def parseArgs():
         help="Wallet to issue refunds from",
     )
     parser.add_argument(
-        "--dry_run",
-        dest="dry_run",
-        nargs='?',
-        required=False,
-        default=False,
-        const=True,
-        help="Indicates whether this should actually broadcast transactions or not",
-    )
-    parser.add_argument(
         "-f",
         "--refund_file",
         dest="refund_file",
         required=False,
         default=None,
         type=open,
+        help=(
+            "CSV file that encodes the delegator addresses and refund amounts. Note: delegator "
+            "address is expected to be in the first column and the refund amount in [DENOM] is "
+            "expected to be in the fourth column."
+        )
+    )
+    parser.add_argument(
+        "--dry_run",
+        dest="dry_run",
+        action='store_const',
+        required=False,
+        default=False,
+        const=True,
         help="Indicates whether this should actually broadcast transactions or not",
+    )
+    parser.add_argument(
+        "--no_broadcast",
+        dest="no_broadcast",
+        action='store_const',
+        required=False,
+        default=False,
+        const=True,
+        help=(
+            "Similar to dry run, but in this case the tx JSON is output and signed, but not "
+            "broadcast. This is useful for testing."
+        ),
     )
     return parser.parse_args()
 
 
 def getRefundAmountsFromFile(file_obj, denom):
-    # return {
-    #     'osmos1asdkhjfaklsjfhaskjdf': 1.234567,
-    # }
     refund_amounts = {}
     refund_reader = csv.reader(file_obj, delimiter=',', quotechar='|')
     denom_multiplier = 10 ** DENOM_EXPONENTS.get(denom, 1)
@@ -332,6 +348,7 @@ def main():
     keyname = args.keyname
     refund_file = args.refund_file
     dry_run = args.dry_run
+    should_broadcast = not args.no_broadcast
     logger.debug(f'DEBUG: args: {args}')
 
     # The next two calls are for calculating slash related refunds.
@@ -344,7 +361,7 @@ def main():
     refund_amounts = getRefundAmountsFromFile(refund_file, denom)
 
     batch_count = buildRefundScript(refund_amounts, send_address, denom, memo)
-    issue_refunds(batch_count, daemon, chain_id, keyname, endpoint, denom, dry_run)
+    issue_refunds(batch_count, daemon, chain_id, keyname, endpoint, denom, should_broadcast, dry_run)
 
 
 if __name__ == "__main__":
