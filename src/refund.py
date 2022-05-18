@@ -143,7 +143,7 @@ def buildRefundJSON(
     message_list = []
     for refund_address in refund_amounts:
 
-        refund_amount = refund_amounds[refund_address]
+        refund_amount = refund_amounts[refund_address]
         if denom in ('uatom', 'uosmo'):
             refund_amount = int(refund_amount)
 
