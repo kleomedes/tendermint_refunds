@@ -142,11 +142,21 @@ def buildRefundJSON(
     }
     message_list = []
     for refund_address in refund_amounts:
+
+        refund_amount = refund_amounds[refund_address]
+        if denom in ('uatom', 'uosmo'):
+            refund_amount = int(refund_amount)
+
         message = {
             "@type": "/cosmos.bank.v1beta1.MsgSend",
             "from_address": send_address,
             "to_address": refund_address,
-            "amount": [{"denom": denom, "amount": str(refund_amounts[refund_address])}],
+            "amount": [
+                {
+                    "denom": denom,
+                    "amount": str(refund_amount)
+                }
+            ],
         }
         message_list.append(message)
     data["body"]["messages"] = message_list
