@@ -254,14 +254,14 @@ def parseArgs():
         "-vc",
         "--valcons_address",
         dest="valcons_address",
-        required=True,
+        required=False,
         help="Valcons address of validator (ex. cosmosvalcons1c5e86exd7jsyhcfqdejltdsagjfrvv8xv22368), you can get this by doing {daemon} tendermint show-address",
     )
     parser.add_argument(
         "-v",
         "--valoper_address",
         dest="valoper_address",
-        required=True,
+        required=False,
         help="Valoper address of validator (ex. cosmosvaloper140l6y2gp3gxvay6qtn70re7z2s0gn57zfd832j), you can get this by doing {daemon} keys show --bech=val -a {keyname}",
     )
     parser.add_argument(
