@@ -197,7 +197,6 @@ def issue_refunds(
         sign_cmd = (
             f"{BIN_DIR}{daemon} tx sign /tmp/dist_{denom}_{i}.json --from {keyname} -ojson "
             f"--output-document ~/dist_{denom}_{i}_signed.json --node {node} --chain-id {chain_id} "
-            f"--keyring-backend test"
         )
         broadcast_cmd = (
             f"{BIN_DIR}{daemon} tx broadcast ~/dist_{denom}_{i}_signed.json --node {node} "
